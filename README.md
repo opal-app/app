@@ -95,13 +95,13 @@
 </head>
 <body class="pb-24">
 
-    <!-- Ekran ładowania (Szybki start bez Firebase) -->
+    <!-- Ekran ładowania -->
     <div id="loading-overlay" class="fixed inset-0 bg-white z-[9999] flex flex-col items-center justify-center transition-opacity duration-500">
         <div class="relative w-20 h-20 mb-4">
             <div class="absolute inset-0 border-4 border-emerald-100 rounded-full"></div>
             <div class="absolute inset-0 border-4 border-emerald-800 rounded-full border-t-transparent animate-spin"></div>
         </div>
-        <p class="font-bold text-emerald-900 tracking-tight">System OPALBUD v2.3 ✨</p>
+        <p class="font-bold text-emerald-900 tracking-tight">System OPALBUD v2.4 ✨</p>
     </div>
 
     <!-- Header -->
@@ -109,7 +109,8 @@
         <div class="max-w-xl mx-auto flex justify-between items-center">
             <div class="flex items-center gap-4">
                 <div class="bg-white p-1.5 rounded-2xl shadow-lg flex items-center justify-center overflow-hidden h-14 w-auto min-w-[70px]">
-                    <img src="agata logo (1).jpg" alt="Logo OPALBUD" class="company-logo-img" onerror="this.src='https://via.placeholder.com/100x60?text=LOGO';">
+                    <!-- Poprawiona nazwa pliku z kodowaniem spacji -->
+                    <img src="agata%20logo%20(1).jpg" alt="Logo OPALBUD" class="company-logo-img" onerror="this.src='https://via.placeholder.com/100x60?text=LOGO';">
                 </div>
                 <div>
                     <h1 class="font-black text-2xl tracking-tighter leading-none uppercase">Opalbud</h1>
@@ -152,19 +153,19 @@
 
                 <div class="space-y-1.5">
                     <div class="flex justify-between items-center mb-1">
-                        <label class="text-[11px] font-black text-slate-500 uppercase ml-1">Opis wykonanych prac</label>
+                        <label class="text-[11px] font-black text-slate-500 uppercase ml-1">Opis prac</label>
                         <button onclick="aiPolishDescription()" class="text-[9px] font-black bg-emerald-100 text-emerald-700 px-3 py-1.5 rounded-full hover:bg-emerald-200 transition-colors flex items-center gap-1">
                             <i class="fas fa-magic"></i> ✨ PROFESJONALNY OPIS
                         </button>
                     </div>
-                    <textarea id="txt-activity" rows="4" placeholder="Wpisz krótko czynności..." class="w-full p-4 bg-slate-50 border border-slate-200 rounded-2xl outline-none resize-none text-sm font-medium focus:border-emerald-500 transition-colors"></textarea>
+                    <textarea id="txt-activity" rows="4" placeholder="Opisz krótko czynności..." class="w-full p-4 bg-slate-50 border border-slate-200 rounded-2xl outline-none resize-none text-sm font-medium focus:border-emerald-500 transition-colors"></textarea>
                 </div>
 
                 <div class="space-y-3">
                     <div class="flex justify-between items-center mb-1">
-                        <label class="text-[11px] font-black text-slate-500 uppercase ml-1">Dokumentacja fotograficzna</label>
+                        <label class="text-[11px] font-black text-slate-500 uppercase ml-1">Zdjęcia</label>
                         <button id="ai-photo-btn" onclick="aiAnalyzePhotos()" class="hidden text-[9px] font-black bg-emerald-100 text-emerald-700 px-3 py-1.5 rounded-full hover:bg-emerald-200 transition-colors flex items-center gap-1">
-                            <i class="fas fa-eye"></i> ✨ ANALIZA ZDJĘĆ
+                            <i class="fas fa-eye"></i> ✨ ANALIZA AI
                         </button>
                     </div>
                     <div id="photo-grid" class="grid grid-cols-4 gap-2 mb-2"></div>
@@ -178,7 +179,7 @@
                 </div>
 
                 <button id="btn-submit" onclick="submitReport()" class="btn-primary w-full py-5 rounded-2xl font-black text-lg shadow-xl shadow-emerald-900/20 flex items-center justify-center gap-3 mt-4">
-                    <i class="fas fa-save"></i> ZAPISZ LOKALNIE
+                    <i class="fas fa-save"></i> ZAPISZ RAPORT
                 </button>
             </div>
         </section>
@@ -210,12 +211,12 @@
         <div class="bg-white w-full max-w-md rounded-[2.5rem] p-8 shadow-2xl">
             <div class="text-center mb-6">
                 <h3 class="font-black text-emerald-900 text-lg uppercase">Podpis Zleceniodawcy</h3>
-                <p class="text-[10px] text-slate-400 font-bold mt-1 uppercase">Zatwierdzenie wykonania przeglądu</p>
+                <p class="text-[10px] text-slate-400 font-bold mt-1 uppercase">Zatwierdzenie przeglądu</p>
             </div>
             <canvas id="signature-pad" class="w-full h-64 rounded-3xl mb-6 border-2 border-slate-100"></canvas>
             <div class="grid grid-cols-2 gap-4">
                 <button onclick="clearSig()" class="py-4 border-2 border-slate-100 rounded-2xl text-slate-400 font-black text-[10px] uppercase">Wyczyść</button>
-                <button onclick="saveSig()" class="py-4 bg-emerald-700 text-white rounded-2xl font-black text-[10px] uppercase shadow-lg shadow-emerald-900/20">Zatwierdź</button>
+                <button onclick="saveSig()" class="py-4 bg-emerald-700 text-white rounded-2xl font-black text-[10px] uppercase">Zatwierdź</button>
             </div>
         </div>
     </div>
@@ -224,7 +225,7 @@
     <div id="pdf-template" style="position: absolute; left: -9999px; width: 800px; padding: 60px; background: white; font-family: sans-serif;">
         <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 4px solid #064e3b; padding-bottom: 20px; margin-bottom: 40px;">
             <div style="display: flex; align-items: center; gap: 20px;">
-                <img src="agata logo (1).jpg" alt="Logo" style="height: 90px; width: auto;">
+                <img src="agata%20logo%20(1).jpg" alt="Logo" style="height: 90px; width: auto;">
                 <div>
                     <h1 style="color: #064e3b; margin: 0; font-size: 38px; font-weight: 900;">OPALBUD</h1>
                     <p style="margin: 0; color: #666; letter-spacing: 2px; font-size: 14px;">SPÓŁKA Z OGRANICZONĄ ODPOWIEDZIALNOŚCIĄ</p>
@@ -262,14 +263,14 @@
 
     <div id="toast" class="fixed bottom-10 left-1/2 -translate-x-1/2 bg-emerald-950 text-white px-8 py-4 rounded-3xl text-xs font-black opacity-0 transition-all z-[2000] shadow-2xl pointer-events-none"></div>
 
-    <script type="module">
-        // --- LOGIKA LOKALNA (BEZ FIREBASE) ---
-        const apiKeyGemini = ""; // System dostarczy klucz Gemini automatycznie
+    <script>
+        // --- NOWA LOGIKA BEZ ZALEŻNOŚCI ---
+        const apiKeyGemini = ""; 
 
         let state = {
             objects: JSON.parse(localStorage.getItem('opal_objects')) || [
-                { id: '1', name: 'Kotłownia Centralna' },
-                { id: '2', name: 'Winda Towarowa A1' }
+                { id: '1', name: 'Kotłownia' },
+                { id: '2', name: 'Winda' }
             ],
             reports: JSON.parse(localStorage.getItem('opal_reports')) || []
         };
@@ -283,17 +284,22 @@
 
         let tempPhotos = [], activeId = null;
 
-        // Limiter ładowania
-        window.onload = () => {
-            setTimeout(() => {
-                document.getElementById('loading-overlay').classList.add('opacity-0');
-                setTimeout(() => document.getElementById('loading-overlay').style.display = 'none', 500);
-            }, 1000);
-            renderObjects();
-            renderReports();
+        // Force hide loader even if images fail
+        const hideLoader = () => {
+            const loader = document.getElementById('loading-overlay');
+            if (loader) {
+                loader.classList.add('opacity-0');
+                setTimeout(() => loader.style.display = 'none', 500);
+            }
         };
 
-        // Gemini AI Functions
+        window.addEventListener('DOMContentLoaded', () => {
+            renderObjects();
+            renderReports();
+            setTimeout(hideLoader, 1000);
+        });
+
+        // Gemini AI 
         async function callGemini(prompt, systemPrompt, imageData = null) {
             const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKeyGemini}`;
             const payload = {
@@ -314,10 +320,10 @@
 
         window.aiPolishDescription = async () => {
             const textarea = document.getElementById('txt-activity');
-            if (!textarea.value.trim()) return showToast("⚠️ Wpisz tekst do poprawy.");
+            if (!textarea.value.trim()) return showToast("⚠️ Wpisz tekst.");
             textarea.classList.add('ai-loading');
-            showToast("✨ AI ulepsza opis...");
-            const polished = await callGemini(`Zamień na profesjonalny opis techniczny: "${textarea.value}"`, "Jesteś ekspertem OPALBUD.");
+            showToast("✨ AI pracuje...");
+            const polished = await callGemini(`Zamień na techniczny opis serwisu: "${textarea.value}"`, "Jesteś technikiem OPALBUD.");
             textarea.classList.remove('ai-loading');
             if (polished) { textarea.value = polished.trim(); showToast("✨ Gotowe!"); }
         };
@@ -325,11 +331,11 @@
         window.aiAnalyzePhotos = async () => {
             const textarea = document.getElementById('txt-activity');
             showToast("✨ AI analizuje zdjęcia...");
-            const analysis = await callGemini("Co widzisz na zdjęciach z serwisu? Opisz usterki.", "Jesteś technikiem.", tempPhotos.slice(0, 3));
+            const analysis = await callGemini("Co widzisz na zdjęciach? Opisz usterki.", "Jesteś ekspertem.", tempPhotos.slice(0, 3));
             if (analysis) { textarea.value += "\n\nAI: " + analysis; showToast("✨ Analiza dodana!"); }
         };
 
-        // CRUD Operations
+        // CRUD
         window.addObj = () => {
             const el = document.getElementById('new-obj');
             if (!el.value) return;
@@ -339,7 +345,7 @@
         };
 
         window.delObj = (id) => {
-            if(confirm("Usunąć lokalizację?")) {
+            if(confirm("Usunąć?")) {
                 state.objects = state.objects.filter(o => o.id !== id);
                 saveState();
             }
@@ -373,21 +379,15 @@
             
             const newReport = {
                 id: 'REP-' + Date.now().toString().slice(-6),
-                object: obj,
-                task: tsk,
-                photos: tempPhotos,
-                ts: Date.now(),
-                date: new Date().toLocaleString('pl-PL'),
-                signed: false
+                object: obj, tsk: tsk, photos: tempPhotos, ts: Date.now(),
+                date: new Date().toLocaleString('pl-PL'), signed: false
             };
-
             state.reports.unshift(newReport);
             document.getElementById('txt-activity').value = ''; 
             tempPhotos = []; 
             renderTempGrid();
-            document.getElementById('ai-photo-btn').classList.add('hidden');
             saveState();
-            showToast("✅ Zapisano raport!");
+            showToast("✅ Zapisano!");
         };
 
         window.openSig = (id) => { activeId = id; document.getElementById('modal-sig').classList.add('active'); setTimeout(initPad, 300); };
@@ -395,13 +395,9 @@
         window.saveSig = () => {
             const sig = canvas.toDataURL('image/png');
             const report = state.reports.find(r => r.id === activeId);
-            if (report) {
-                report.signed = true;
-                report.signature = sig;
-                saveState();
-            }
+            if (report) { report.signed = true; report.signature = sig; saveState(); }
             closeMod('modal-sig');
-            showToast("✍️ Podpis zapisany.");
+            showToast("✍️ Podpisano.");
         };
 
         window.genPDF = async (id) => {
@@ -409,7 +405,7 @@
             document.getElementById('pdf-rid').innerText = r.id;
             document.getElementById('pdf-date').innerText = r.date;
             document.getElementById('pdf-obj').innerText = r.object;
-            document.getElementById('pdf-task').innerText = r.task;
+            document.getElementById('pdf-task').innerText = r.tsk;
             document.getElementById('pdf-sig-img').src = r.signature || '';
             document.getElementById('pdf-photos').innerHTML = (r.photos || []).map(p => `<img src="${p}" style="width:100%; border-radius:10px;">`).join('');
 
@@ -417,8 +413,7 @@
             setTimeout(async () => {
                 const canv = await html2canvas(document.getElementById('pdf-template'), { scale: 2 });
                 const pdf = new jspdf.jsPDF('p', 'mm', 'a4');
-                const w = pdf.internal.pageSize.getWidth();
-                pdf.addImage(canv.toDataURL('image/jpeg', 0.95), 'JPEG', 0, 0, w, (canv.height * w) / canv.width);
+                pdf.addImage(canv.toDataURL('image/jpeg', 0.95), 'JPEG', 0, 0, pdf.internal.pageSize.getWidth(), (canv.height * pdf.internal.pageSize.getWidth()) / canv.width);
                 pdf.save(`PROTOKOL_${r.object.replace(/\s/g, '_')}.pdf`);
             }, 800);
         };
@@ -426,13 +421,12 @@
         function renderObjects() {
             const sel = document.getElementById('sel-object');
             const cur = sel.value;
-            sel.innerHTML = '<option value="" disabled selected>Wybierz lokalizację...</option>' + 
+            sel.innerHTML = '<option value="" disabled selected>Wybierz...</option>' + 
                 state.objects.map(o => `<option value="${o.name}" ${cur === o.name ? 'selected' : ''}>${o.name}</option>`).join('');
-            
             document.getElementById('mgr-list').innerHTML = state.objects.map(o => `
                 <div class="flex justify-between items-center p-4 bg-slate-50 rounded-2xl border border-slate-100 animate-fade-in">
                     <span class="font-bold text-slate-700 text-sm">${o.name}</span>
-                    <button onclick="window.delObj('${o.id}')" class="text-red-400 p-2"><i class="fas fa-trash-can"></i></button></div>`).join('');
+                    <button onclick="window.delObj('${o.id}')" class="text-red-400 p-2"><i class="fas fa-trash"></i></button></div>`).join('');
         }
 
         function renderReports() {
@@ -441,31 +435,18 @@
                 <div class="glass-card p-6 rounded-[2.5rem] shadow-sm border border-slate-100 flex flex-col gap-4 animate-fade-in">
                     <div class="flex justify-between items-start">
                         <div><h4 class="font-black text-emerald-950 text-sm uppercase">${r.object}</h4><p class="text-[10px] text-slate-400 font-bold uppercase">${r.date}</p></div>
-                        ${r.signed ? '<span class="bg-emerald-100 text-emerald-700 text-[8px] font-black px-2 py-1 rounded-md">ZATWIERDZONO</span>' : '<span class="bg-amber-100 text-amber-700 text-[8px] font-black px-2 py-1 rounded-md">DO PODPISU</span>'}
+                        ${r.signed ? '<span class="bg-emerald-100 text-emerald-700 text-[8px] font-black px-2 py-1 rounded-md">OK</span>' : '<span class="bg-amber-100 text-amber-700 text-[8px] font-black px-2 py-1 rounded-md">BRAK PODPISU</span>'}
                     </div>
-                    <p class="text-xs text-slate-600 italic">"${r.task}"</p>
+                    <p class="text-xs text-slate-600 italic">"${r.tsk}"</p>
                     <div class="flex gap-2">
-                        ${r.signed ? `<button onclick="window.genPDF('${r.id}')" class="flex-1 bg-emerald-800 text-white py-4 rounded-2xl text-[10px] font-black uppercase tracking-widest"><i class="fas fa-file-pdf mr-2"></i> POBIERZ PDF</button>` : `<button onclick="window.openSig('${r.id}')" class="flex-1 bg-white text-emerald-800 py-4 rounded-2xl text-[10px] font-black uppercase tracking-widest border-2 border-emerald-800">PODPISZ</button>`}
+                        ${r.signed ? `<button onclick="window.genPDF('${r.id}')" class="flex-1 bg-emerald-800 text-white py-4 rounded-2xl text-[10px] font-black uppercase"><i class="fas fa-file-pdf mr-2"></i> PDF</button>` : `<button onclick="window.openSig('${r.id}')" class="flex-1 bg-white text-emerald-800 py-4 rounded-2xl text-[10px] font-black uppercase border-2 border-emerald-800">PODPISZ</button>`}
                         <button onclick="deleteReport('${r.id}')" class="bg-red-50 text-red-500 w-12 rounded-2xl flex items-center justify-center"><i class="fas fa-trash"></i></button>
                     </div></div>`).join('');
         }
 
-        window.deleteReport = (id) => {
-            if(confirm("Usunąć raport trwale?")) {
-                state.reports = state.reports.filter(r => r.id !== id);
-                saveState();
-            }
-        };
-
-        function showToast(m) {
-            const t = document.getElementById('toast');
-            t.innerText = m; t.style.opacity = '1'; t.style.bottom = '40px';
-            setTimeout(() => { t.style.opacity = '0'; t.style.bottom = '10px'; }, 3000);
-        }
-
-        const canvas = document.getElementById('signature-pad');
-        const ctx = canvas.getContext('2d');
-        let drw = false;
+        window.deleteReport = (id) => { if(confirm("Usunąć?")) { state.reports = state.reports.filter(r => r.id !== id); saveState(); } };
+        function showToast(m) { const t = document.getElementById('toast'); t.innerText = m; t.style.opacity = '1'; t.style.bottom = '40px'; setTimeout(() => { t.style.opacity = '0'; t.style.bottom = '10px'; }, 3000); }
+        const canvas = document.getElementById('signature-pad'); const ctx = canvas.getContext('2d'); let drw = false;
         function initPad() {
             canvas.width = canvas.offsetWidth; canvas.height = canvas.offsetHeight;
             ctx.lineWidth = 3; ctx.strokeStyle = '#064e3b'; ctx.lineJoin = 'round'; ctx.lineCap = 'round';
@@ -475,11 +456,9 @@
             canvas.onmousedown = start; canvas.onmousemove = move; window.onmouseup = () => drw = false;
             canvas.ontouchstart = start; canvas.ontouchmove = move; canvas.ontouchend = () => drw = false;
         }
-
         window.clearSig = () => ctx.clearRect(0, 0, canvas.width, canvas.height);
         window.openManager = () => document.getElementById('modal-mgr').classList.add('active');
         window.closeMod = (id) => document.getElementById(id).classList.remove('active');
-
         setInterval(() => { document.getElementById('current-time').innerText = new Date().toLocaleTimeString('pl-PL', { hour: '2-digit', minute: '2-digit' }); }, 1000);
     </script>
 </body>
