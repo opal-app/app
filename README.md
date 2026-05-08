@@ -2,260 +2,143 @@
 <html lang="pl">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <title>OPALBUD - Panel Konserwatora</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>OPALBUD - Serwis v2.8</title>
     
-    <!-- Biblioteki zewnętrzne (CDN) -->
+    <!-- Podstawowe biblioteki -->
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&display=swap');
-        
-        :root { 
-            --opal-green: #064e3b; 
-            --opal-bg: #f8fafc; 
-        }
-
-        body { 
-            background-color: var(--opal-bg); 
-            font-family: 'Inter', sans-serif; 
-            -webkit-tap-highlight-color: transparent;
-            overscroll-behavior-y: contain;
-        }
-
-        #signature-pad { 
-            border: 2px dashed #cbd5e1; 
-            background: #fff; 
-            touch-action: none; 
-            cursor: crosshair; 
-        }
-
-        .modal { 
-            display: none; 
-            position: fixed; 
-            inset: 0; 
-            background: rgba(0,0,0,0.8); 
-            z-index: 1000; 
-            align-items: center; 
-            justify-content: center; 
-            padding: 20px;
-            backdrop-filter: blur(4px);
-        }
-
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap');
+        :root { --opal-green: #064e3b; --opal-bg: #f8fafc; }
+        body { background-color: var(--opal-bg); font-family: 'Inter', sans-serif; margin: 0; -webkit-tap-highlight-color: transparent; }
+        .card { background: white; border-radius: 24px; padding: 20px; border: 1px solid #e2e8f0; box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
+        .btn-primary { background: var(--opal-green); color: white; padding: 16px; border-radius: 16px; font-weight: bold; width: 100%; transition: transform 0.1s; }
+        .btn-primary:active { transform: scale(0.98); }
+        #signature-pad { border: 2px dashed #cbd5e1; background: #fff; touch-action: none; width: 100%; height: 240px; border-radius: 20px; }
+        .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.8); z-index: 1000; align-items: center; justify-content: center; padding: 20px; backdrop-filter: blur(4px); }
         .modal.active { display: flex; }
-
-        .btn-primary { 
-            background-color: var(--opal-green); 
-            color: white; 
-            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1); 
-        }
-
-        .btn-primary:active { 
-            transform: scale(0.95); 
-            background-color: #043d2e; 
-        }
-
-        .glass-card {
-            background: rgba(255, 255, 255, 0.9);
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(6, 78, 59, 0.05);
-        }
-
-        .no-scrollbar::-webkit-scrollbar { display: none; }
-        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-        .animate-fade-in { animation: fadeIn 0.3s ease-out forwards; }
-
-        .ai-loading {
-            background: linear-gradient(90deg, #ecfdf5 0%, #d1fae5 50%, #ecfdf5 100%);
-            background-size: 200% 100%;
-            animation: shimmer 1.5s infinite;
-        }
-
-        @keyframes shimmer {
-            0% { background-position: 200% 0; }
-            100% { background-position: -200% 0; }
-        }
-
-        .company-logo-img {
-            max-height: 52px;
-            width: auto;
-            object-fit: contain;
-        }
     </style>
 </head>
-<body class="pb-24">
+<body class="pb-20">
 
-    <!-- Ekran ładowania z przyciskiem awaryjnym -->
-    <div id="loading-overlay" class="fixed inset-0 bg-white z-[9999] flex flex-col items-center justify-center transition-opacity duration-500">
-        <div class="relative w-20 h-20 mb-4">
-            <div class="absolute inset-0 border-4 border-emerald-100 rounded-full"></div>
-            <div class="absolute inset-0 border-4 border-emerald-800 rounded-full border-t-transparent animate-spin"></div>
-        </div>
-        <p class="font-bold text-emerald-900 tracking-tight">System OPALBUD v2.5 ✨</p>
-        <button onclick="hideLoader()" class="mt-8 text-[10px] text-slate-400 underline uppercase tracking-widest">Uruchom mimo wszystko</button>
-    </div>
-
-    <!-- Header -->
-    <header class="bg-[#064e3b] text-white p-6 shadow-xl sticky top-0 z-50 rounded-b-[2.5rem]">
+    <!-- Nagłówek -->
+    <header class="bg-[#064e3b] text-white p-5 sticky top-0 z-50 rounded-b-[2rem] shadow-lg">
         <div class="max-w-xl mx-auto flex justify-between items-center">
-            <div class="flex items-center gap-4">
-                <div class="bg-white p-1.5 rounded-2xl shadow-lg flex items-center justify-center overflow-hidden h-14 w-auto min-w-[70px]">
-                    <img src="agata%20logo%20(1).jpg" alt="Logo OPALBUD" class="company-logo-img" onerror="this.src='https://via.placeholder.com/100x60?text=OPALBUD';">
+            <div class="flex items-center gap-3">
+                <div class="bg-white p-1 rounded-xl shadow-inner flex items-center justify-center h-12 min-w-[60px]">
+                    <!-- Próba załadowania logo z obsługą spacji w nazwie pliku -->
+                    <img src="agata%20logo%20(1).jpg" alt="Logo" style="max-height: 40px;" onerror="this.parentElement.innerHTML='<i class=\'fas fa-tools text-emerald-800 text-xl\'></i>'">
                 </div>
                 <div>
-                    <h1 class="font-black text-2xl tracking-tighter leading-none uppercase">Opalbud</h1>
-                    <p class="text-[10px] text-emerald-300 uppercase font-black tracking-[0.2em] mt-1">Tryb Mobilny</p>
+                    <h1 class="font-black text-xl leading-none uppercase tracking-tighter">Opalbud</h1>
+                    <p class="text-[9px] text-emerald-300 font-bold uppercase tracking-widest mt-1">Panel Serwisowy</p>
                 </div>
             </div>
-            <div class="flex items-center gap-3">
-                <button onclick="openManager()" class="w-10 h-10 flex items-center justify-center bg-emerald-900/40 rounded-full text-emerald-200 active:scale-90 transition-transform">
-                    <i class="fas fa-list-check"></i>
-                </button>
-                <div id="status-dot" class="w-4 h-4 rounded-full bg-emerald-500 border-2 border-[#064e3b] shadow-inner"></div>
-            </div>
+            <button onclick="toggleModal('modal-mgr')" class="bg-emerald-900/50 w-10 h-10 rounded-full flex items-center justify-center text-emerald-200">
+                <i class="fas fa-cog"></i>
+            </button>
         </div>
     </header>
 
-    <main class="max-w-xl mx-auto p-5 space-y-8 mt-4">
+    <main class="max-w-xl mx-auto p-4 space-y-6">
         
-        <!-- Sekcja: Nowy Protokół -->
-        <section class="glass-card rounded-[2.5rem] shadow-xl p-7 animate-fade-in">
-            <div class="flex items-center justify-between mb-6">
-                <h2 class="text-emerald-900 font-black text-lg flex items-center gap-3">
-                    <span class="w-8 h-8 bg-emerald-100 text-emerald-600 rounded-lg flex items-center justify-center text-sm">
-                        <i class="fas fa-plus"></i>
-                    </span>
-                    Nowy Protokół
-                </h2>
-                <span id="current-time" class="text-[10px] font-bold text-slate-400 uppercase"></span>
+        <!-- Formularz Dodawania -->
+        <div class="card animate-fade-in">
+            <div class="flex justify-between items-center mb-4">
+                <h2 class="font-black text-slate-800 flex items-center gap-2"><i class="fas fa-edit text-emerald-500"></i> Nowy Raport</h2>
+                <span id="clock" class="text-[10px] font-bold text-slate-400"></span>
             </div>
 
-            <div class="space-y-5">
-                <div class="space-y-1.5">
-                    <label class="text-[11px] font-black text-slate-500 uppercase ml-1">Obiekt / Lokalizacja</label>
-                    <div class="relative">
-                        <select id="sel-object" class="w-full p-4 bg-slate-50 border border-slate-200 rounded-2xl outline-none appearance-none font-bold text-slate-800 focus:border-emerald-500 transition-colors">
-                            <option value="" disabled selected>Wybierz...</option>
-                        </select>
-                        <i class="fas fa-chevron-down absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none text-xs"></i>
-                    </div>
+            <div class="space-y-4">
+                <div>
+                    <label class="text-[10px] font-black text-slate-400 uppercase ml-1">Wybierz Obiekt</label>
+                    <select id="sel-obj" class="w-full p-4 bg-slate-50 rounded-2xl border-none outline-none font-bold text-slate-700 appearance-none shadow-inner"></select>
                 </div>
 
-                <div class="space-y-1.5">
-                    <div class="flex justify-between items-center mb-1">
-                        <label class="text-[11px] font-black text-slate-500 uppercase ml-1">Opis prac</label>
-                        <button onclick="aiPolishDescription()" class="text-[9px] font-black bg-emerald-100 text-emerald-700 px-3 py-1.5 rounded-full hover:bg-emerald-200 transition-colors flex items-center gap-1">
-                            <i class="fas fa-magic"></i> ✨ POPRAW OPIS
-                        </button>
-                    </div>
-                    <textarea id="txt-activity" rows="4" placeholder="Opisz czynności serwisowe..." class="w-full p-4 bg-slate-50 border border-slate-200 rounded-2xl outline-none resize-none text-sm font-medium focus:border-emerald-500 transition-colors"></textarea>
+                <div>
+                    <label class="text-[10px] font-black text-slate-400 uppercase ml-1">Opis wykonanych prac</label>
+                    <textarea id="txt-act" rows="4" placeholder="Opisz czynności serwisowe..." class="w-full p-4 bg-slate-50 rounded-2xl border-none outline-none text-sm shadow-inner resize-none"></textarea>
                 </div>
 
-                <div class="space-y-3">
-                    <div class="flex justify-between items-center mb-1">
-                        <label class="text-[11px] font-black text-slate-500 uppercase ml-1">Zdjęcia</label>
-                        <button id="ai-photo-btn" onclick="aiAnalyzePhotos()" class="hidden text-[9px] font-black bg-emerald-100 text-emerald-700 px-3 py-1.5 rounded-full hover:bg-emerald-200 transition-colors flex items-center gap-1">
-                            <i class="fas fa-eye"></i> ✨ ANALIZA AI
-                        </button>
-                    </div>
-                    <div id="photo-grid" class="grid grid-cols-4 gap-2 mb-2"></div>
-                    <label class="flex items-center justify-center w-full py-6 border-2 border-dashed border-slate-200 rounded-2xl bg-slate-50 cursor-pointer active:bg-emerald-50 transition-all">
-                        <input type="file" id="file-input" multiple accept="image/*" class="hidden" onchange="handleImg(event)">
-                        <div class="text-center">
-                            <i class="fas fa-camera text-emerald-700 text-2xl mb-2"></i>
-                            <p class="text-[10px] font-black text-emerald-800 uppercase tracking-wider">Dodaj zdjęcia</p>
-                        </div>
+                <div>
+                    <label class="text-[10px] font-black text-slate-400 uppercase ml-1">Zdjęcia</label>
+                    <div id="grid-photos" class="grid grid-cols-4 gap-2 my-2"></div>
+                    <label class="flex flex-col items-center justify-center p-6 border-2 border-dashed border-slate-200 rounded-2xl bg-slate-50 cursor-pointer active:bg-emerald-50 transition-colors">
+                        <input type="file" multiple accept="image/*" class="hidden" onchange="processImages(event)">
+                        <i class="fas fa-camera text-2xl text-emerald-700 mb-1"></i>
+                        <span class="text-[10px] font-black text-emerald-800">DODAJ ZDJĘCIA</span>
                     </label>
                 </div>
 
-                <button id="btn-submit" onclick="submitReport()" class="btn-primary w-full py-5 rounded-2xl font-black text-lg shadow-xl shadow-emerald-900/20 flex items-center justify-center gap-3 mt-4">
-                    <i class="fas fa-save"></i> ZAPISZ RAPORT
+                <button onclick="saveReport()" class="btn-primary flex items-center justify-center gap-2 shadow-xl shadow-emerald-900/20">
+                    <i class="fas fa-check-circle"></i> ZAPISZ W PAMIĘCI
                 </button>
             </div>
-        </section>
+        </div>
 
-        <!-- Sekcja: Historia -->
-        <section class="space-y-4 animate-fade-in" style="animation-delay: 0.1s">
-            <div class="flex justify-between items-center px-4">
-                <h3 class="font-black text-emerald-900 text-xs uppercase tracking-[0.15em]">Zapisane raporty</h3>
-                <span id="badge-count" class="bg-emerald-800 text-white w-6 h-6 flex items-center justify-center rounded-full text-[10px] font-bold">0</span>
+        <!-- Lista Raportów -->
+        <div class="space-y-4">
+            <div class="flex justify-between items-center px-2">
+                <h3 class="text-[10px] font-black text-slate-400 uppercase tracking-widest text-emerald-900">Ostatnie Wpisy</h3>
+                <span id="count-badge" class="bg-emerald-100 text-emerald-700 text-[10px] font-black px-2 py-0.5 rounded-full">0</span>
             </div>
-            <div id="reports-list" class="space-y-4"></div>
-        </section>
+            <div id="list-reports" class="space-y-4"></div>
+        </div>
     </main>
 
-    <!-- Modale -->
+    <!-- Modal: Zarządzanie Obiektami -->
     <div id="modal-mgr" class="modal">
-        <div class="bg-white w-full max-w-md rounded-[2.5rem] p-8 shadow-2xl flex flex-col max-h-[80vh]">
-            <h3 class="font-black text-emerald-900 text-xl mb-6">Lista Obiektów</h3>
-            <div class="flex gap-2 mb-6">
-                <input type="text" id="new-obj" placeholder="Nowy obiekt..." class="flex-1 p-4 bg-slate-50 border border-slate-200 rounded-xl text-sm outline-none">
-                <button onclick="addObj()" class="bg-emerald-700 text-white w-14 rounded-xl font-bold active:scale-90 transition-transform"><i class="fas fa-plus"></i></button>
+        <div class="bg-white w-full max-w-sm p-6 rounded-[2rem] shadow-2xl">
+            <h3 class="font-black text-slate-800 mb-4">Lista Obiektów</h3>
+            <div class="flex gap-2 mb-4">
+                <input type="text" id="in-new-obj" placeholder="Nazwa..." class="flex-1 p-3 bg-slate-100 rounded-xl outline-none text-sm">
+                <button onclick="addObject()" class="bg-emerald-600 text-white px-4 rounded-xl font-bold"><i class="fas fa-plus"></i></button>
             </div>
-            <div id="mgr-list" class="space-y-3 overflow-y-auto no-scrollbar pr-1"></div>
-            <button onclick="closeMod('modal-mgr')" class="w-full py-4 bg-slate-100 text-slate-500 rounded-2xl font-black text-[10px] mt-6 uppercase tracking-widest">Zamknij</button>
+            <div id="list-mgr" class="space-y-2 max-h-60 overflow-y-auto pr-2 mb-4"></div>
+            <button onclick="toggleModal('modal-mgr')" class="w-full p-4 bg-slate-100 text-slate-400 font-black text-[10px] rounded-2xl uppercase tracking-widest">Zamknij</button>
         </div>
     </div>
 
+    <!-- Modal: Podpis -->
     <div id="modal-sig" class="modal">
-        <div class="bg-white w-full max-w-md rounded-[2.5rem] p-8 shadow-2xl">
-            <div class="text-center mb-6">
-                <h3 class="font-black text-emerald-900 text-lg uppercase">Podpis Zleceniodawcy</h3>
-            </div>
-            <canvas id="signature-pad" class="w-full h-64 rounded-3xl mb-6 border-2 border-slate-100"></canvas>
-            <div class="grid grid-cols-2 gap-4">
-                <button onclick="clearSig()" class="py-4 border-2 border-slate-100 rounded-2xl text-slate-400 font-black text-[10px] uppercase">Wyczyść</button>
-                <button onclick="saveSig()" class="py-4 bg-emerald-700 text-white rounded-2xl font-black text-[10px] uppercase">Zatwierdź</button>
+        <div class="bg-white w-full max-w-sm p-6 rounded-[2rem] shadow-2xl text-center">
+            <h3 class="font-black text-slate-800 mb-4 uppercase tracking-tighter">Podpis Zleceniodawcy</h3>
+            <canvas id="signature-pad"></canvas>
+            <div class="grid grid-cols-2 gap-3 mt-4">
+                <button onclick="clearSig()" class="p-4 bg-slate-100 text-slate-400 font-bold rounded-2xl text-xs uppercase">Czyść</button>
+                <button onclick="saveSig()" class="p-4 bg-emerald-600 text-white font-bold rounded-2xl text-xs uppercase shadow-lg shadow-emerald-600/30">Zatwierdź</button>
             </div>
         </div>
     </div>
 
-    <!-- Szablon PDF -->
-    <div id="pdf-template" style="position: absolute; left: -9999px; width: 800px; padding: 60px; background: white; font-family: sans-serif;">
-        <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 4px solid #064e3b; padding-bottom: 20px; margin-bottom: 40px;">
+    <!-- Template PDF (Ukryty) -->
+    <div id="pdf-box" style="position: absolute; left: -9999px; width: 800px; padding: 60px; background: white; font-family: sans-serif; color: #000;">
+        <div style="border-bottom: 4px solid #064e3b; padding-bottom: 20px; margin-bottom: 40px; display: flex; justify-content: space-between; align-items: center;">
             <div style="display: flex; align-items: center; gap: 20px;">
-                <img src="agata%20logo%20(1).jpg" alt="Logo" style="height: 80px; width: auto;">
+                <img src="agata%20logo%20(1).jpg" style="height: 80px;" onerror="this.style.display='none'">
                 <div>
-                    <h1 style="color: #064e3b; margin: 0; font-size: 38px; font-weight: 900;">OPALBUD</h1>
-                    <p style="margin: 0; color: #666; letter-spacing: 2px; font-size: 14px;">SPÓŁKA Z O.O.</p>
+                    <h1 style="margin:0; font-size: 36px; font-weight: 900; color: #064e3b;">OPALBUD</h1>
+                    <p style="margin:0; font-size: 14px; color: #666;">PROTOKÓŁ KONSERWACJI TECHNICZNEJ</p>
                 </div>
             </div>
-            <div style="text-align: right;">
-                <p style="margin: 0; font-size: 10px; color: #999; font-weight: bold; text-transform: uppercase;">Protokół Serwisowy</p>
-                <p style="margin: 0; font-weight: bold; font-size: 14px; color: #064e3b;" id="pdf-rid"></p>
-            </div>
+            <div style="text-align: right;"><p style="margin:0; font-size: 10px; color: #999;">NR RAPORTU:</p><p style="margin:0; font-weight: bold;" id="p-rid"></p></div>
         </div>
-        <table style="width: 100%; border-collapse: collapse; margin-bottom: 30px;">
-            <tr><td style="padding: 10px 0; font-size: 12px; color: #999; width: 150px;">DATA SERWISU</td><td style="padding: 10px 0; font-weight: bold;" id="pdf-date"></td></tr>
-            <tr><td style="padding: 10px 0; font-size: 12px; color: #999;">OBIEKT</td><td style="padding: 10px 0; font-weight: bold; font-size: 18px;" id="pdf-obj"></td></tr>
-        </table>
-        <div style="background: #f8fafc; padding: 30px; border-radius: 20px; margin-bottom: 40px; border: 1px solid #eef2f6;">
-            <p style="margin: 0 0 10px; font-size: 12px; color: #999; font-weight: bold;">Opis prac:</p>
-            <p style="margin: 0; line-height: 1.6; color: #333; font-size: 15px;" id="pdf-task"></p>
+        <p><strong>DATA SERWISU:</strong> <span id="p-date"></span></p>
+        <p><strong>OBIEKT:</strong> <span id="p-obj" style="font-size: 20px;"></span></p>
+        <div style="background: #f8fafc; padding: 30px; border-radius: 20px; margin: 30px 0; border: 1px solid #eee;">
+            <p style="font-size: 12px; color: #666; margin-bottom: 10px; font-weight: bold;">OPIS WYKONANYCH CZYNNOŚCI:</p>
+            <p id="p-task" style="line-height: 1.6; font-size: 16px;"></p>
         </div>
-        <div id="pdf-photos" style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; margin-bottom: 60px;"></div>
-        <div style="display: flex; justify-content: space-between; align-items: flex-end; gap: 60px; margin-top: 60px;">
-            <div style="text-align: center; flex: 1;">
-                <div style="height: 100px; border-bottom: 1px solid #064e3b; margin-bottom: 10px;">
-                    <p style="color: #f1f5f9; font-size: 32px; font-weight: 900; padding-top: 30px;">OPALBUD</p>
-                </div>
-                <p style="font-size: 10px; color: #064e3b; font-weight: 900;">Konserwator</p>
-            </div>
-            <div style="text-align: center; flex: 1;">
-                <div style="height: 100px; border-bottom: 1px solid #064e3b; margin-bottom: 10px; display: flex; align-items: center; justify-content: center;">
-                    <img id="pdf-sig-img" src="" style="max-height: 90px; max-width: 100%;">
-                </div>
-                <p style="font-size: 10px; color: #064e3b; font-weight: 900;">Zleceniodawca</p>
+        <div id="p-images" style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 40px;"></div>
+        <div style="display: flex; justify-content: space-between; margin-top: 80px;">
+            <div style="text-align: center; width: 45%; border-top: 1px solid #ccc; padding-top: 10px; font-size: 12px; font-weight: bold; color: #064e3b;">Pieczęć i podpis Konserwatora</div>
+            <div style="text-align: center; width: 45%; border-top: 1px solid #ccc; padding-top: 10px; font-size: 12px; font-weight: bold; color: #064e3b;">
+                <img id="p-sig" src="" style="max-height: 100px; display: block; margin: 0 auto 10px;">
+                Podpis Zleceniodawcy
             </div>
         </div>
     </div>
@@ -263,224 +146,117 @@
     <div id="toast" class="fixed bottom-10 left-1/2 -translate-x-1/2 bg-emerald-950 text-white px-8 py-4 rounded-3xl text-xs font-black opacity-0 transition-all z-[2000] shadow-2xl pointer-events-none"></div>
 
     <script>
-        // --- LOGIKA BARDZIEJ ODPORNA (v2.5) ---
-        const apiKeyGemini = ""; 
-
-        // Funkcja natychmiastowa usuwająca loader
-        const hideLoader = () => {
-            const overlay = document.getElementById('loading-overlay');
-            if (overlay) {
-                overlay.style.opacity = '0';
-                setTimeout(() => overlay.style.display = 'none', 500);
-            }
+        // --- LOGIKA APLIKACJI v2.8 ---
+        let data = {
+            objs: JSON.parse(localStorage.getItem('opal_o')) || [{id:1, name:'Budynek Administracyjny'}],
+            reps: JSON.parse(localStorage.getItem('opal_r')) || []
         };
 
-        // Zabezpieczenie: jeśli nic się nie stanie, usuń loader po 2 sekundach
-        setTimeout(hideLoader, 2000);
-
-        let state = {
-            objects: JSON.parse(localStorage.getItem('opal_objects')) || [
-                { id: '1', name: 'Kotłownia - Przegląd' },
-                { id: '2', name: 'Winda - Konserwacja' }
-            ],
-            reports: JSON.parse(localStorage.getItem('opal_reports')) || []
+        const sync = () => {
+            localStorage.setItem('opal_o', JSON.stringify(data.objs));
+            localStorage.setItem('opal_r', JSON.stringify(data.reps));
+            render();
         };
 
-        const saveState = () => {
-            try {
-                localStorage.setItem('opal_objects', JSON.stringify(state.objects));
-                localStorage.setItem('opal_reports', JSON.stringify(state.reports));
-                renderObjects();
-                renderReports();
-            } catch (e) {
-                showToast("⚠️ Przekroczono pamięć zdjęć! Usuń stare raporty.");
-            }
-        };
+        let currentPhotos = [], currentId = null;
 
-        let tempPhotos = [], activeId = null;
-
-        document.addEventListener('DOMContentLoaded', () => {
-            renderObjects();
-            renderReports();
-            hideLoader();
-        });
-
-        // Gemini AI
-        async function callGemini(prompt, systemPrompt, imageData = null) {
-            const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKeyGemini}`;
-            const payload = {
-                contents: [{
-                    parts: [
-                        { text: prompt },
-                        ...(imageData ? imageData.map(data => ({ inlineData: { mimeType: "image/jpeg", data: data.split(',')[1] } })) : [])
-                    ]
-                }],
-                systemInstruction: { parts: [{ text: systemPrompt }] }
-            };
-            try {
-                const response = await fetch(endpoint, { method: 'POST', body: JSON.stringify(payload) });
-                const result = await response.json();
-                return result.candidates?.[0]?.content?.parts?.[0]?.text || null;
-            } catch (e) { return null; }
-        }
-
-        window.aiPolishDescription = async () => {
-            const textarea = document.getElementById('txt-activity');
-            if (!textarea.value.trim()) return showToast("⚠️ Wpisz cokolwiek.");
-            textarea.classList.add('ai-loading');
-            showToast("✨ AI ulepsza opis...");
-            const polished = await callGemini(`Zamień na techniczny opis: "${textarea.value}"`, "Jesteś technikiem OPALBUD.");
-            textarea.classList.remove('ai-loading');
-            if (polished) { textarea.value = polished.trim(); showToast("✨ Gotowe!"); }
-        };
-
-        window.aiAnalyzePhotos = async () => {
-            const textarea = document.getElementById('txt-activity');
-            showToast("✨ AI patrzy na zdjęcia...");
-            const analysis = await callGemini("Opisz usterki widoczne na zdjęciach.", "Jesteś ekspertem.", tempPhotos.slice(0, 3));
-            if (analysis) { textarea.value += "\n\nAI: " + analysis; showToast("✨ Dodano analizę!"); }
-        };
-
-        // CRUD
-        window.addObj = () => {
-            const el = document.getElementById('new-obj');
-            if (!el.value) return;
-            state.objects.push({ id: Date.now().toString(), name: el.value.trim() });
-            el.value = '';
-            saveState();
-        };
-
-        window.delObj = (id) => {
-            if(confirm("Usunąć?")) {
-                state.objects = state.objects.filter(o => o.id !== id);
-                saveState();
-            }
-        };
-
-        window.handleImg = (e) => {
-            const aiBtn = document.getElementById('ai-photo-btn');
+        // Przetwarzanie zdjęć
+        function processImages(e) {
             for (let f of e.target.files) {
-                const rd = new FileReader();
-                rd.onload = (ev) => { 
-                    // Prosta redukcja rozmiaru dla localStorage
+                const reader = new FileReader();
+                reader.onload = (ev) => {
                     const img = new Image();
                     img.src = ev.target.result;
                     img.onload = () => {
                         const canvas = document.createElement('canvas');
-                        const MAX_WIDTH = 600;
-                        const scale = MAX_WIDTH / img.width;
-                        canvas.width = MAX_WIDTH;
-                        canvas.height = img.height * scale;
-                        const ctx = canvas.getContext('2d');
-                        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-                        tempPhotos.push(canvas.toDataURL('image/jpeg', 0.7));
-                        renderTempGrid();
-                        aiBtn.classList.remove('hidden');
+                        const scale = 600 / img.width;
+                        canvas.width = 600; canvas.height = img.height * scale;
+                        canvas.getContext('2d').drawImage(img, 0, 0, 600, canvas.height);
+                        currentPhotos.push(canvas.toDataURL('image/jpeg', 0.6));
+                        renderPhotos();
                     };
                 };
-                rd.readAsDataURL(f);
+                reader.readAsDataURL(f);
             }
-        };
-
-        function renderTempGrid() {
-            document.getElementById('photo-grid').innerHTML = tempPhotos.map((p, idx) => `
-                <div class="relative animate-fade-in"><img src="${p}" class="w-full aspect-square object-cover rounded-xl border border-slate-200">
-                <button onclick="removeTempPhoto(${idx})" class="absolute -top-1 -right-1 bg-red-500 text-white w-5 h-5 rounded-full text-[8px] flex items-center justify-center"><i class="fas fa-times"></i></button></div>`).join('');
         }
 
-        window.removeTempPhoto = (idx) => {
-            tempPhotos.splice(idx, 1);
-            renderTempGrid();
-            if (tempPhotos.length === 0) document.getElementById('ai-photo-btn').classList.add('hidden');
-        };
+        function renderPhotos() {
+            document.getElementById('grid-photos').innerHTML = currentPhotos.map((p,i) => `
+                <div class="relative"><img src="${p}" class="w-full aspect-square object-cover rounded-xl border border-slate-200 shadow-sm">
+                <button onclick="currentPhotos.splice(${i},1);renderPhotos()" class="absolute -top-1 -right-1 bg-red-500 text-white w-5 h-5 rounded-full text-[8px] flex items-center justify-center shadow-lg">X</button></div>`).join('');
+        }
 
-        window.submitReport = () => {
-            const obj = document.getElementById('sel-object').value;
-            const tsk = document.getElementById('txt-activity').value;
-            if(!obj || !tsk) return showToast("⚠️ Wypełnij formularz!");
+        // Akcje Raportu
+        function saveReport() {
+            const o = document.getElementById('sel-obj').value;
+            const t = document.getElementById('txt-act').value;
+            if(!o || !t) return showToast("⚠️ Uzupełnij opis!");
             
-            state.reports.unshift({
-                id: 'R-' + Date.now().toString().slice(-5),
-                object: obj, task: tsk, photos: [...tempPhotos], ts: Date.now(),
-                date: new Date().toLocaleString('pl-PL'), signed: false
+            data.reps.unshift({
+                id: Math.random().toString(36).substr(2, 6).toUpperCase(),
+                obj: o, task: t, photos: [...currentPhotos], date: new Date().toLocaleString(), signed: false
             });
-            document.getElementById('txt-activity').value = ''; 
-            tempPhotos = []; 
-            renderTempGrid();
-            saveState();
-            showToast("✅ Zapisano raport!");
-        };
-
-        window.openSig = (id) => { activeId = id; document.getElementById('modal-sig').classList.add('active'); setTimeout(initPad, 300); };
-        
-        window.saveSig = () => {
-            const sig = canvas.toDataURL('image/png');
-            const report = state.reports.find(r => r.id === activeId);
-            if (report) { report.signed = true; report.signature = sig; saveState(); }
-            closeMod('modal-sig');
-        };
-
-        window.genPDF = async (id) => {
-            const r = state.reports.find(x => x.id === id);
-            document.getElementById('pdf-rid').innerText = r.id;
-            document.getElementById('pdf-date').innerText = r.date;
-            document.getElementById('pdf-obj').innerText = r.object;
-            document.getElementById('pdf-task').innerText = r.task;
-            document.getElementById('pdf-sig-img').src = r.signature || '';
-            document.getElementById('pdf-photos').innerHTML = (r.photos || []).map(p => `<img src="${p}" style="width:100%; border-radius:10px;">`).join('');
-
-            showToast("⚙️ Składanie PDF...");
-            setTimeout(async () => {
-                const canv = await html2canvas(document.getElementById('pdf-template'), { scale: 2 });
-                const pdf = new jspdf.jsPDF('p', 'mm', 'a4');
-                const w = pdf.internal.pageSize.getWidth();
-                pdf.addImage(canv.toDataURL('image/jpeg', 0.95), 'JPEG', 0, 0, w, (canv.height * w) / canv.width);
-                pdf.save(`RAPORT_${r.id}.pdf`);
-            }, 800);
-        };
-
-        function renderObjects() {
-            const sel = document.getElementById('sel-object');
-            const cur = sel.value;
-            sel.innerHTML = '<option value="" disabled selected>Wybierz...</option>' + 
-                state.objects.map(o => `<option value="${o.name}" ${cur === o.name ? 'selected' : ''}>${o.name}</option>`).join('');
-            document.getElementById('mgr-list').innerHTML = state.objects.map(o => `
-                <div class="flex justify-between items-center p-4 bg-slate-50 rounded-2xl border border-slate-100">
-                    <span class="font-bold text-slate-700 text-sm">${o.name}</span>
-                    <button onclick="window.delObj('${o.id}')" class="text-red-400 p-2"><i class="fas fa-trash"></i></button></div>`).join('');
+            
+            document.getElementById('txt-act').value = ""; currentPhotos = []; renderPhotos();
+            sync();
+            showToast("✅ Zapisano pomyślnie!");
         }
 
-        function renderReports() {
-            document.getElementById('badge-count').innerText = state.reports.length;
-            document.getElementById('reports-list').innerHTML = state.reports.map(r => `
-                <div class="glass-card p-6 rounded-[3xl] shadow-sm border border-slate-100 flex flex-col gap-4 animate-fade-in">
+        function render() {
+            document.getElementById('sel-obj').innerHTML = data.objs.map(o => `<option value="${o.name}">${o.name}</option>`).join('');
+            document.getElementById('count-badge').innerText = data.reps.length;
+            document.getElementById('list-reports').innerHTML = data.reps.map(r => `
+                <div class="card p-6 flex flex-col gap-3">
                     <div class="flex justify-between items-start">
-                        <div><h4 class="font-black text-emerald-950 text-sm uppercase leading-tight">${r.object}</h4><p class="text-[10px] text-slate-400 font-bold">${r.date}</p></div>
-                        ${r.signed ? '<span class="text-emerald-600 text-[10px] font-black italic">PODPISANO</span>' : '<span class="text-amber-600 text-[10px] font-black italic">BRAK PODPISU</span>'}
+                        <div><h4 class="font-black text-emerald-950 text-sm uppercase leading-tight">${r.obj}</h4><p class="text-[10px] font-bold text-slate-400 mt-1">${r.date}</p></div>
+                        <span class="text-[8px] font-black px-2 py-1 rounded-md ${r.signed ? 'bg-emerald-100 text-emerald-700':'bg-amber-100 text-amber-700'}">${r.signed ? 'PODPISANO':'CZEKA'}</span>
                     </div>
-                    <p class="text-xs text-slate-600 italic">"${r.task}"</p>
+                    <p class="text-xs text-slate-600 italic">"${r.task.substring(0, 100)}${r.task.length > 100 ? '...':''}"</p>
                     <div class="flex gap-2">
-                        ${r.signed ? `<button onclick="window.genPDF('${r.id}')" class="flex-1 bg-emerald-800 text-white py-4 rounded-2xl text-[10px] font-black uppercase"><i class="fas fa-file-pdf mr-2"></i> POBIERZ PDF</button>` : `<button onclick="window.openSig('${r.id}')" class="flex-1 bg-white text-emerald-800 py-4 rounded-2xl text-[10px] font-black uppercase border-2 border-emerald-800">PODPISZ</button>`}
-                        <button onclick="deleteReport('${r.id}')" class="bg-red-50 text-red-500 w-12 rounded-2xl flex items-center justify-center"><i class="fas fa-trash"></i></button>
-                    </div></div>`).join('');
+                        ${r.signed ? `<button onclick="downloadPDF('${r.id}')" class="flex-1 bg-emerald-800 text-white py-4 rounded-2xl text-[10px] font-black uppercase shadow-lg shadow-emerald-900/20">Pobierz PDF</button>` : `<button onclick="openSignature('${r.id}')" class="flex-1 bg-white text-emerald-800 py-4 rounded-2xl text-[10px] font-black border-2 border-emerald-800">Podpis Klienta</button>`}
+                        <button onclick="if(confirm('Usunąć?')){data.reps=data.reps.filter(x=>x.id!='${r.id}');sync()}" class="w-12 bg-red-50 text-red-500 rounded-2xl flex items-center justify-center"><i class="fas fa-trash"></i></button>
+                    </div>
+                </div>`).join('');
+            
+            document.getElementById('list-mgr').innerHTML = data.objs.map(o => `<div class="flex justify-between p-3 bg-slate-50 rounded-xl mb-1 text-sm font-bold"><span>${o.name}</span><button onclick="data.objs=data.objs.filter(x=>x.id!=${o.id});sync()" class="text-red-400"><i class="fas fa-times"></i></button></div>`).join('');
         }
 
-        window.deleteReport = (id) => { if(confirm("Usunąć?")) { state.reports = state.reports.filter(r => r.id !== id); saveState(); } };
-        function showToast(m) { const t = document.getElementById('toast'); t.innerText = m; t.style.opacity = '1'; t.style.bottom = '40px'; setTimeout(() => { t.style.opacity = '0'; t.style.bottom = '10px'; }, 3000); }
-        const canvas = document.getElementById('signature-pad'); const ctx = canvas.getContext('2d'); let drw = false;
-        function initPad() {
-            canvas.width = canvas.offsetWidth; canvas.height = canvas.offsetHeight;
-            ctx.lineWidth = 3; ctx.strokeStyle = '#064e3b'; ctx.lineJoin = 'round'; ctx.lineCap = 'round';
-            const getP = (e) => { const r = canvas.getBoundingClientRect(); const cx = e.touches ? e.touches[0].clientX : e.clientX; const cy = e.touches ? e.touches[0].clientY : e.clientY; return { x: cx - r.left, y: cy - r.top }; };
-            const start = (e) => { drw = true; ctx.beginPath(); const p = getP(e); ctx.moveTo(p.x, p.y); e.preventDefault(); };
-            const move = (e) => { if(!drw) return; const p = getP(e); ctx.lineTo(p.x, p.y); ctx.stroke(); e.preventDefault(); };
-            canvas.onmousedown = start; canvas.onmousemove = move; window.onmouseup = () => drw = false;
-            canvas.ontouchstart = start; canvas.ontouchmove = move; canvas.ontouchend = () => drw = false;
+        async function downloadPDF(id) {
+            const r = data.reps.find(x => x.id === id);
+            document.getElementById('p-rid').innerText = r.id;
+            document.getElementById('p-date').innerText = r.date;
+            document.getElementById('p-obj').innerText = r.obj;
+            document.getElementById('p-task').innerText = r.task;
+            document.getElementById('p-sig').src = r.signature || '';
+            document.getElementById('p-images').innerHTML = r.photos.map(p => `<img src="${p}" style="width:100%; border-radius:10px; border:1px solid #eee;">`).join('');
+            
+            showToast("⚙️ Budowanie PDF...");
+            setTimeout(async () => {
+                const canv = await html2canvas(document.getElementById('pdf-box'), {scale: 2});
+                const pdf = new jspdf.jsPDF('p', 'mm', 'a4');
+                pdf.addImage(canv.toDataURL('image/jpeg', 0.9), 'JPEG', 0, 0, 210, (canv.height * 210) / canv.width);
+                pdf.save(`RAPORT_${r.obj.replace(/\s/g, '_')}.pdf`);
+            }, 600);
         }
-        window.clearSig = () => ctx.clearRect(0, 0, canvas.width, canvas.height);
-        window.openManager = () => document.getElementById('modal-mgr').classList.add('active');
-        window.closeMod = (id) => document.getElementById(id).classList.remove('active');
-        setInterval(() => { document.getElementById('current-time').innerText = new Date().toLocaleTimeString('pl-PL', { hour: '2-digit', minute: '2-digit' }); }, 1000);
+
+        // Obsługa Podpisu (Canvas)
+        const can = document.getElementById('signature-pad'); const ctx = can.getContext('2d'); let drawing = false;
+        function openSignature(id) { currentId = id; toggleModal('modal-sig'); can.width = can.offsetWidth; can.height = can.offsetHeight; ctx.lineWidth = 3; ctx.lineCap = 'round'; ctx.strokeStyle = '#064e3b'; }
+        const getPos = (e) => { const r = can.getBoundingClientRect(); const c = e.touches ? e.touches[0] : e; return { x: c.clientX - r.left, y: c.clientY - r.top }; };
+        can.onmousedown = (e) => { drawing = true; ctx.beginPath(); const p = getPos(e); ctx.moveTo(p.x, p.y); };
+        can.onmousemove = (e) => { if(drawing) { const p = getPos(e); ctx.lineTo(p.x, p.y); ctx.stroke(); } };
+        window.onmouseup = () => drawing = false;
+        can.ontouchstart = (e) => { e.preventDefault(); can.onmousedown(e); };
+        can.ontouchmove = (e) => { e.preventDefault(); can.onmousemove(e); };
+
+        function saveSig() { const r = data.reps.find(x => x.id === currentId); r.signed = true; r.signature = can.toDataURL(); sync(); toggleModal('modal-sig'); }
+        function clearSig() { ctx.clearRect(0,0,can.width,can.height); }
+        function addObject() { const v = document.getElementById('in-new-obj').value; if(v){ data.objs.push({id:Date.now(), name:v}); document.getElementById('in-new-obj').value=""; sync(); } }
+        function toggleModal(id) { document.getElementById(id).classList.toggle('active'); }
+        function showToast(m) { const t = document.getElementById('toast'); t.innerText = m; t.style.opacity = '1'; t.style.bottom = '30px'; setTimeout(() => { t.style.opacity = '0'; t.style.bottom = '10px'; }, 3000); }
+        
+        setInterval(() => { document.getElementById('clock').innerText = new Date().toLocaleTimeString(); }, 1000);
+        window.onload = render;
     </script>
 </body>
 </html>
